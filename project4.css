@@ -1,0 +1,9 @@
+/* ここからCSSを記述してください。 */
+.font-step {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.font-item{
+    font-size: 1.3rem;
+}
