@@ -7,7 +7,8 @@ const config = {
     step2 : document.getElementById("step2"),
     step3 : document.getElementById("step3"),
     step4 : document.getElementById("step4"),
-    result : document.getElementById("result")
+    result : document.getElementById("result"),
+    url : "https://api.recursionist.io/builder/computers?type="
 }
 
 const battery =
@@ -179,51 +180,130 @@ class View{
         config.title.classList.add("col-12", "p-3", "bg-secondary");
     }
 
-    static makeStep1View(){
-        let brandCheck = [];
-        let step1HTML = "";
-        for (let i = 0; i < camera.length; i++){
-            if (brandCheck.indexOf(camera[i].brand) === -1 ){
-                brandCheck.push(camera[i].brand);
-                step1HTML += `
-                    <li><button class="dropdown-item" type="button" id="${camera[i].brand}" onclick="Control.displayBrand('${camera[i].brand}')">${camera[i].brand}</button></li>`;
+    static makeDropDown(type ,item ,target, btnId){
+
+        let check = [];
+        let makeHTML = "";
+
+        fetch(config.url+type).then(response=>response.json()).then(data=>{
+            for (let tmp in data){
+                let currentTmp = data[tmp];
+                if (check.indexOf(currentTmp[item]) === -1 ){
+                    check.push(currentTmp[item]);
+                    makeHTML += `
+                        <li><button class="dropdown-item" type="button" id="${currentTmp[item]}" onclick="Control.displayBrand('${currentTmp[item]}')">${currentTmp[item]}</button></li>`;
+                }
             }
-        }
-
-        config.step1.innerHTML = `
-            <p class="text-start font-step">step1: Select your CPU</p>
-            <div class="row m-0">
-                <p class="mr-3 font-item">Brand</p>
+            
+            target.innerHTML += `            
+                <p class="mx-3 font-item">${item}</p>
                 <div class="dropdown mb-3">
-                    <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button id=${btnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         項目を選択してください
                     </button>
-                    <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-                        ${step1HTML}
+                    <ui class="dropdown-menu" aria-labelledby="step1Btn">
+                        ${makeHTML}
                     </ui>
                 </div>
-
-                <p class="mx-3 font-item">Model</p>
-                <div class="dropdown mb-3">
-                    <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        項目を選択してください
-                    </button>
-                    <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-                        ${step1HTML}
-                    </ui>
-                </div>
-            </div>`;
+            `;
         
-        config.step1.classList.add("ml-3");
-        // console.log(config.step1.innerHTML);
+        // console.log(target.innerHTML);
+        })
     }
+
+    static makeStep1View(){
+        View.makeDropDown("cpu","Brand",config.step1, "step1BrandBtn");
+        View.makeDropDown("cpu","Model",config.step1, "step1ModelBtn");
+
+        // let brandCheck = [];
+        // let step1HTML = "";
+
+        // fetch(config.url+"cpu").then(response=>response.json()).then(data=>{
+        //     for (let cpu in data){
+        //         let currentCpu = data[cpu];
+        //         if (brandCheck.indexOf(currentCpu[item]) === -1 ){
+        //             brandCheck.push(currentCpu[item]);
+        //             step1HTML += `
+        //                 <li><button class="dropdown-item" type="button" id="${currentCpu[item]}" onclick="Control.displayBrand('${currentCpu[item]}')">${currentCpu[item]}</button></li>`;
+        //         }
+        //     }
+        //     config.step1.innerHTML = `
+        //     <p class="text-start font-step">step1: Select your CPU</p>
+        //     <div class="row m-0">
+        //         <p class="mr-3 font-item">Brand</p>
+        //         <div class="dropdown mb-3">
+        //             <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        //                 項目を選択してください
+        //             </button>
+        //             <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
+        //                 ${step1HTML}
+        //             </ui>
+        //         </div>
+
+        //         <p class="mx-3 font-item">Model</p>
+        //         <div class="dropdown mb-3">
+        //             <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        //                 項目を選択してください
+        //             </button>
+        //             <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
+        //                 ${step1HTML}
+        //             </ui>
+        //         </div>
+        //     </div>`;
+        
+        // config.step1.classList.add("ml-3");
+        // // console.log(config.step1.innerHTML);
+        // })
+    }
+
+    // static makeStep1View(){
+    //     let brandCheck = [];
+    //     let step1HTML = "";
+
+    //     fetch(config.url+"cpu").then(response=>response.json()).then(data=>{
+    //         for (let cpu in data){
+    //             let currentCpu = data[cpu];
+    //             if (brandCheck.indexOf(currentCpu[Brand]) === -1 ){
+    //                 brandCheck.push(currentCpu[Brand]);
+    //                 step1HTML += `
+    //                     <li><button class="dropdown-item" type="button" id="${currentCpu[Brand]}" onclick="Control.displayBrand('${currentCpu[Brand]}')">${currentCpu[Brand]}</button></li>`;
+    //             }
+    //         }
+    //         config.step1.innerHTML = `
+    //         <p class="text-start font-step">step1: Select your CPU</p>
+    //         <div class="row m-0">
+    //             <p class="mr-3 font-item">Brand</p>
+    //             <div class="dropdown mb-3">
+    //                 <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    //                     項目を選択してください
+    //                 </button>
+    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
+    //                     ${step1HTML}
+    //                 </ui>
+    //             </div>
+
+    //             <p class="mx-3 font-item">Model</p>
+    //             <div class="dropdown mb-3">
+    //                 <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    //                     項目を選択してください
+    //                 </button>
+    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
+    //                     ${step1HTML}
+    //                 </ui>
+    //             </div>
+    //         </div>`;
+        
+    //     config.step1.classList.add("ml-3");
+    //     // console.log(config.step1.innerHTML);
+    //     })
+    // }   
 
     static makeStep2View(){
         let modelCheck = [];
         let step2HTML = "";
         let brandName = document.getElementById("step1Btn").innerHTML;
         for (let i = 0; i < camera.length; i++){
-            if (modelCheck.indexOf(camera[i].model) === -1 && brandName === camera[i].brand){
+            if (modelCheck.indexOf(camera[i].model) === -1 && brandName === camera[i][item]){
                 modelCheck.push(camera[i].model);
                 step2HTML += `
                     <li><button class="dropdown-item" type="button" id="${camera[i].model}" onclick="Control.displayModel('${camera[i].model}')">${camera[i].model}</button></li>`;
@@ -415,7 +495,7 @@ class Control{
         let passBatterys = [];
 
         for (let i = 0; i < camera.length; i++){
-            if (selectedBrand === camera[i].brand && selectedModel === camera[i].model){
+            if (selectedBrand === camera[i][item] && selectedModel === camera[i].model){
                 selectedPowerConsumptionWh = camera[i].powerConsumptionWh;
                 break
             }
@@ -450,7 +530,10 @@ function initializeApp(){
                 </div>
             </div>
             <div class="row">
-                <div id="step1">
+                <div>
+                    <p class="text-start font-step ml-3">step1: Select your CPU</p>
+                    <div id="step1" class="row m-0">
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -475,6 +558,6 @@ function initializeApp(){
 // console.log(target);
 View.makeTitle();
 View.makeStep1View();
-View.makeStep2View();
-View.makeStep3View();
-View.makeStep4View();
+// View.makeStep2View();
+// View.makeStep3View();
+// View.makeStep4View();
