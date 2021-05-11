@@ -11,167 +11,6 @@ const config = {
     url : "https://api.recursionist.io/builder/computers?type="
 }
 
-const battery =
-    [{
-        "batteryName": "WKL-78",
-        "capacityAh": 2.3,
-        "voltage": 14.4,
-        "maxDraw": 3.2,
-        "endVoltage": 10,
-    },
-    {
-        "batteryName": "WKL-140",
-        "capacityAh": 4.5,
-        "voltage": 14.4,
-        "maxDraw": 9.2,
-        "endVoltage": 5,
-    },
-    {
-        "batteryName": "Wmacro-78",
-        "capacityAh": 2.5,
-        "voltage": 14.5,
-        "maxDraw": 10,
-        "endVoltage": 5,
-    },
-    {
-        "batteryName": "Wmacro-140",
-        "capacityAh": 3.6,
-        "voltage": 14.4,
-        "maxDraw": 14,
-        "endVoltage": 5,
-    },
-    {
-        "batteryName": "IOP-E78",
-        "capacityAh": 6.6,
-        "voltage": 14.4,
-        "maxDraw": 10.5,
-        "endVoltage": 8,
-    },
-    {
-        "batteryName": "IOP-E140",
-        "capacityAh": 9.9,
-        "voltage": 14.4,
-        "maxDraw": 14,
-        "endVoltage": 10,
-    },
-    {
-        "batteryName": "IOP-E188",
-        "capacityAh": 13.2,
-        "voltage": 14.4,
-        "maxDraw": 14,
-        "endVoltage": 11,
-    },
-    {
-        "batteryName": "RYN-C65",
-        "capacityAh": 4.9,
-        "voltage": 14.8,
-        "maxDraw": 4.9,
-        "endVoltage": 11,
-    },
-    {
-        "batteryName": "RYN-C85",
-        "capacityAh": 6.3,
-        "voltage": 14.4,
-        "maxDraw": 6.3,
-        "endVoltage": 12,
-    },
-    {
-        "batteryName": "RYN-C140",
-        "capacityAh": 9.8,
-        "voltage": 14.8,
-        "maxDraw": 10,
-        "endVoltage": 12,
-    },
-    {
-        "batteryName": "RYN-C290",
-        "capacityAh": 19.8,
-        "voltage": 14.4,
-        "maxDraw": 14,
-        "endVoltage": 12,
-    }]
-;
-
-const camera =
-    [{
-        "brand": "Cakon",
-        "model": "ABC 3000M",
-        "powerConsumptionWh": 35.5,
-    },
-    {
-        "brand": "Cakon",
-        "model": "ABC 5000M",
-        "powerConsumptionWh": 37.2,
-    },
-    {
-        "brand": "Cakon",
-        "model": "ABC 7000M",
-        "powerConsumptionWh": 39.7,
-    },
-    {
-        "brand": "Cakon",
-        "model": "ABC 9000M",
-        "powerConsumptionWh": 10.9,
-    },
-    {
-        "brand": "Cakon",
-        "model": "ABC 9900M",
-        "powerConsumptionWh": 15.7,
-    },
-    {
-        "brand": "Go MN",
-        "model": "UIK 110C",
-        "powerConsumptionWh": 62.3,
-    },
-    {
-        "brand": "Go MN",
-        "model": "UIK 210C",
-        "powerConsumptionWh": 64.3,
-    },
-    {
-        "brand": "Go MN",
-        "model": "UIK 230C",
-        "powerConsumptionWh": 26.3,
-    },
-    {
-        "brand": "Go MN",
-        "model": "UIK 250C",
-        "powerConsumptionWh": 15.3,
-    },
-    {
-        "brand": "Go MN",
-        "model": "UIK 270C",
-        "powerConsumptionWh": 20.3,
-    },
-    {
-        "brand": "VANY",
-        "model": "CEV 1100P",
-        "powerConsumptionWh": 22,
-    },
-    {
-        "brand": "VANY",
-        "model": "CEV 1300P",
-        "powerConsumptionWh": 23,
-    },
-    {
-        "brand": "VANY",
-        "model": "CEV 1500P",
-        "powerConsumptionWh": 24,
-    },
-    {
-        "brand": "VANY",
-        "model": "CEV 1700P",
-        "powerConsumptionWh": 25,
-    },
-    {
-        "brand": "VANY",
-        "model": "CEV 1900P",
-        "powerConsumptionWh": 26,
-    }]
-;
-
-// console.log(battery);
-// console.log(camera);
-
 class View{
     static makeTitle(){
         config.title.innerHTML = `
@@ -191,7 +30,7 @@ class View{
                 if (check.indexOf(currentTmp[item]) === -1 ){
                     check.push(currentTmp[item]);
                     makeHTML += `
-                        <li><button class="dropdown-item" type="button" id="${currentTmp[item]}" onclick="Control.displayBrand('${currentTmp[item]}')">${currentTmp[item]}</button></li>`;
+                        <li><button class="dropdown-item" type="button" id=${btnId} onclick="Control.displayBrand('${currentTmp[item]}', '${btnId}')">${currentTmp[item]}</button></li>`;
                 }
             }
             
@@ -212,131 +51,54 @@ class View{
     }
 
     static makeStep1View(){
-        View.makeDropDown("cpu","Brand",config.step1, "step1BrandBtn");
-        View.makeDropDown("cpu","Model",config.step1, "step1ModelBtn");
-
-        // let brandCheck = [];
-        // let step1HTML = "";
-
-        // fetch(config.url+"cpu").then(response=>response.json()).then(data=>{
-        //     for (let cpu in data){
-        //         let currentCpu = data[cpu];
-        //         if (brandCheck.indexOf(currentCpu[item]) === -1 ){
-        //             brandCheck.push(currentCpu[item]);
-        //             step1HTML += `
-        //                 <li><button class="dropdown-item" type="button" id="${currentCpu[item]}" onclick="Control.displayBrand('${currentCpu[item]}')">${currentCpu[item]}</button></li>`;
-        //         }
-        //     }
-        //     config.step1.innerHTML = `
-        //     <p class="text-start font-step">step1: Select your CPU</p>
-        //     <div class="row m-0">
-        //         <p class="mr-3 font-item">Brand</p>
-        //         <div class="dropdown mb-3">
-        //             <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        //                 項目を選択してください
-        //             </button>
-        //             <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-        //                 ${step1HTML}
-        //             </ui>
-        //         </div>
-
-        //         <p class="mx-3 font-item">Model</p>
-        //         <div class="dropdown mb-3">
-        //             <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        //                 項目を選択してください
-        //             </button>
-        //             <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-        //                 ${step1HTML}
-        //             </ui>
-        //         </div>
-        //     </div>`;
-        
-        // config.step1.classList.add("ml-3");
-        // // console.log(config.step1.innerHTML);
-        // })
+        View.makeDropDown("cpu","Brand",config.step1, "cpuBrandBtn");
+        View.makeDropDown("cpu","Model",config.step1, "cpuModelBtn");
     }
 
-    // static makeStep1View(){
-    //     let brandCheck = [];
-    //     let step1HTML = "";
+    static makeStep2View(){
+        View.makeDropDown("gpu","Brand",config.step2, "gpuBrandBtn");
+        View.makeDropDown("gpu","Model",config.step2, "gpuModelBtn");
+    }
 
-    //     fetch(config.url+"cpu").then(response=>response.json()).then(data=>{
-    //         for (let cpu in data){
-    //             let currentCpu = data[cpu];
-    //             if (brandCheck.indexOf(currentCpu[Brand]) === -1 ){
-    //                 brandCheck.push(currentCpu[Brand]);
-    //                 step1HTML += `
-    //                     <li><button class="dropdown-item" type="button" id="${currentCpu[Brand]}" onclick="Control.displayBrand('${currentCpu[Brand]}')">${currentCpu[Brand]}</button></li>`;
-    //             }
+    // static makeStep2View(){
+    //     let modelCheck = [];
+    //     let step2HTML = "";
+    //     let brandName = document.getElementById("step1Btn").innerHTML;
+    //     for (let i = 0; i < camera.length; i++){
+    //         if (modelCheck.indexOf(camera[i].model) === -1 && brandName === camera[i][item]){
+    //             modelCheck.push(camera[i].model);
+    //             step2HTML += `
+    //                 <li><button class="dropdown-item" type="button" id="${camera[i].model}" onclick="Control.displayModel('${camera[i].model}')">${camera[i].model}</button></li>`;
     //         }
-    //         config.step1.innerHTML = `
-    //         <p class="text-start font-step">step1: Select your CPU</p>
+    //     }
+
+    //     config.step2.innerHTML = `
+    //         <p class="font-step">step2: Select your GPU</p>
     //         <div class="row m-0">
     //             <p class="mr-3 font-item">Brand</p>
     //             <div class="dropdown mb-3">
-    //                 <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    //                 <button id="step2Btn" role="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     //                     項目を選択してください
     //                 </button>
-    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-    //                     ${step1HTML}
+    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step2Btn">
+    //                     ${step2HTML}
     //                 </ui>
     //             </div>
-
+                
     //             <p class="mx-3 font-item">Model</p>
     //             <div class="dropdown mb-3">
-    //                 <button id="step1Btn" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    //                 <button id="step2Btn" role="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     //                     項目を選択してください
     //                 </button>
-    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step1Btn">
-    //                     ${step1HTML}
+    //                 <ui id="step1List" class="dropdown-menu" aria-labelledby="step2Btn">
+    //                     ${step2HTML}
     //                 </ui>
     //             </div>
-    //         </div>`;
-        
-    //     config.step1.classList.add("ml-3");
-    //     // console.log(config.step1.innerHTML);
-    //     })
-    // }   
-
-    static makeStep2View(){
-        let modelCheck = [];
-        let step2HTML = "";
-        let brandName = document.getElementById("step1Btn").innerHTML;
-        for (let i = 0; i < camera.length; i++){
-            if (modelCheck.indexOf(camera[i].model) === -1 && brandName === camera[i][item]){
-                modelCheck.push(camera[i].model);
-                step2HTML += `
-                    <li><button class="dropdown-item" type="button" id="${camera[i].model}" onclick="Control.displayModel('${camera[i].model}')">${camera[i].model}</button></li>`;
-            }
-        }
-
-        config.step2.innerHTML = `
-            <p class="font-step">step2: Select your GPU</p>
-            <div class="row m-0">
-                <p class="mr-3 font-item">Brand</p>
-                <div class="dropdown mb-3">
-                    <button id="step2Btn" role="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        項目を選択してください
-                    </button>
-                    <ui id="step1List" class="dropdown-menu" aria-labelledby="step2Btn">
-                        ${step2HTML}
-                    </ui>
-                </div>
-                
-                <p class="mx-3 font-item">Model</p>
-                <div class="dropdown mb-3">
-                    <button id="step2Btn" role="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        項目を選択してください
-                    </button>
-                    <ui id="step1List" class="dropdown-menu" aria-labelledby="step2Btn">
-                        ${step2HTML}
-                    </ui>
-                </div>
-            </div>
-            `
-        config.step2.classList.add("ml-3");
-        // console.log(brandName);
-    }
+    //         </div>
+    //         `
+    //     config.step2.classList.add("ml-3");
+    //     // console.log(brandName);
+    // }
 
     static makeStep3View(){
 
@@ -474,11 +236,11 @@ class View{
 }
 
 class Control{
-    static displayBrand(brand){
-        let brandName = document.getElementById("step1Btn");
+    static displayBrand(brand, btnId){
+        let brandName = document.getElementById(btnId);
         brandName.innerHTML = brand;
         // console.log(brand);
-        View.makeStep2View();
+        // View.makeStep2View();
     }
 
     static displayModel(model){
@@ -537,7 +299,10 @@ function initializeApp(){
                 </div>
             </div>
             <div class="row">
-                <div id="step2">
+                <div>
+                    <p class="font-step ml-3">step2: Select your GPU</p>
+                    <div id="step2" class="row m-0">
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -558,6 +323,6 @@ function initializeApp(){
 // console.log(target);
 View.makeTitle();
 View.makeStep1View();
-// View.makeStep2View();
+View.makeStep2View();
 // View.makeStep3View();
 // View.makeStep4View();
