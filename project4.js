@@ -19,45 +19,80 @@ class View{
         config.title.classList.add("col-12", "p-3", "bg-secondary");
     }
 
-    static makeDropDown(type ,item ,target, btnId){
+    static makeDropDownStep1and2(type ,tag , brandBtnId, modelBtnId){
 
         let check = [];
         let makeHTML = "";
+        
+        fetch(config.url+type).then(response=>response.json()).then(data=>{
+            for (let tmp in data){
+                let currentTmp = data[tmp];
+                
+                if (check.indexOf(currentTmp["Brand"]) === -1){
+                    check.push(currentTmp["Brand"]);
+                    makeHTML += `
+                        <li><button class="dropdown-item" type="button" id=${brandBtnId} onclick="Control.displayBrand('${type}', '${tag}' ,'${currentTmp["Brand"]}','${brandBtnId}','${modelBtnId}')">${currentTmp["Brand"]}</button></li>`;
+                }
+            }
+            
+            config[tag].innerHTML += `            
+                <p class="mx-3 font-item">Brand</p>
+                <div class="dropdown mb-3">
+                    <button id=${brandBtnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        項目を選択してください
+                    </button>
+                    <ui class="dropdown-menu" aria-labelledby="${brandBtnId}">
+                        ${makeHTML}
+                    </ui>
+                </div>
+                <p class="mx-3 font-item">Model</p>
+                <div class="dropdown mb-3">
+                    <button id=${modelBtnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        項目を選択してください
+                    </button>
+                    <ui class="dropdown-menu" aria-labelledby="${modelBtnId}">
+                        
+                    </ui>
+                </div>
+            `;
+        
+        // console.log(target.innerHTML);
+        });
+        
+    }
+
+    static refreshDropDownModel(type ,tag , brandBtnId, modelBtnId){
+
+        let check = [];
+        let makeHTML = "";
+        let selectedBrand = document.getElementById(brandBtnId).innerHTML;
+
+        
 
         fetch(config.url+type).then(response=>response.json()).then(data=>{
             for (let tmp in data){
                 let currentTmp = data[tmp];
-                if (check.indexOf(currentTmp[item]) === -1 ){
-                    check.push(currentTmp[item]);
+                
+                if (check.indexOf(currentTmp["Model"]) === -1 && currentTmp["Brand"] === selectedBrand){
+                    check.push(currentTmp["Model"]);
                     makeHTML += `
-                        <li><button class="dropdown-item" type="button" id=${btnId} onclick="Control.displayBrand('${currentTmp[item]}', '${btnId}')">${currentTmp[item]}</button></li>`;
+                        <li><button class="dropdown-item" type="button" id=${modelBtnId} onclick="Control.displayModel('${type}', '${tag}' ,'${currentTmp["Model"]}','${brandBtnId}','${modelBtnId}')">${currentTmp["Model"]}</button></li>`;
                 }
             }
-            
-            target.innerHTML += `            
-                <p class="mx-3 font-item">${item}</p>
-                <div class="dropdown mb-3">
-                    <button id=${btnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        項目を選択してください
-                    </button>
-                    <ui class="dropdown-menu" aria-labelledby="step1Btn">
-                        ${makeHTML}
-                    </ui>
-                </div>
-            `;
+            console.log(document.getElementById(modelBtnId));
+            config[tag].querySelectorAll(".dropdown-menu")[1].innerHTML = `${makeHTML}`;
         
         // console.log(target.innerHTML);
         })
     }
 
     static makeStep1View(){
-        View.makeDropDown("cpu","Brand",config.step1, "cpuBrandBtn");
-        View.makeDropDown("cpu","Model",config.step1, "cpuModelBtn");
+        View.makeDropDownStep1and2("cpu","step1", "cpuBrandBtn", "cpuModelBtn");
     }
 
-    static makeStep2View(){
-        View.makeDropDown("gpu","Brand",config.step2, "gpuBrandBtn");
-        View.makeDropDown("gpu","Model",config.step2, "gpuModelBtn");
+    static makeStep2View(){        
+        View.makeDropDownStep1and2("gpu","step2", "gpuBrandBtn", "gpuModelBtn"); 
+        // View.makeDropDownModel("gpu","step2", "gpuModelBtn");
     }
 
     // static makeStep2View(){
@@ -236,18 +271,23 @@ class View{
 }
 
 class Control{
-    static displayBrand(brand, btnId){
-        let brandName = document.getElementById(btnId);
-        brandName.innerHTML = brand;
-        // console.log(brand);
+    static displayBrand(type, tag, brand, brandBtnId, modelBtnId){
+        let brandName = document.getElementById(brandBtnId);
+        if (brandName.innerHTML !== brand){
+            brandName.innerHTML = brand;
+        Control.displayModel(type, tag, "項目を選択してください", brandBtnId, modelBtnId);
+        }
+        
+        View.refreshDropDownModel(type, tag, brandBtnId, modelBtnId);
         // View.makeStep2View();
     }
 
-    static displayModel(model){
-        let brandName = document.getElementById("step2Btn");
-        brandName.innerHTML = model;
+    static displayModel(type, tag, model, brandBtnId, modelBtnId){
+        let modelName = document.getElementById(modelBtnId);
+        modelName.innerHTML = model;
+
         // console.log(brand);
-        Control.screening();
+        // Control.screening();
     }
 
     static screening(){
