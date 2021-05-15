@@ -90,6 +90,47 @@ class View{
         }            
     }
 
+    static makeDropDownModelList(type, tag, btns){
+        let check = [];
+        let makeHTML = "";
+        let selectedBrand;
+        let selectedAmount;
+        let limitation = true;      
+
+        for (let i = 0; i < btns.length; i++){
+            let tempBtnId = btns[i]["btnId"];
+
+            if (View.doesInvolve(tempBtnId, "Brand")) selectedBrand = document.getElementById(btns[i]["btnId"]).innerHTML;
+
+            if ((tag === "step3" || tag === "step4") && View.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
+
+            if (View.doesInvolve(tempBtnId, "Model")){
+                fetch(config.url+type).then(response=>response.json()).then(data=>{
+                    for (let tempData in data){
+                        let current = data[tempData];
+                        let currentAmount;
+
+                        if (tag === "step3") currentAmount = View.getAmount(current["Model"], "x");
+                        if (tag === "step4") currentAmount = View.getAmount(current["Model"], "B");
+                        limitation = currentAmount === selectedAmount;
+
+                        if (check.indexOf(current["Model"]) === -1 && current["Brand"] === selectedBrand && limitation){
+                            check.push(current["Model"]);
+                            // makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", current["Brand"]);
+                        }
+                    }
+                    check.sort();
+                    for(let i = 0; i < check.length; i++){
+                        makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Model", check[i]);
+                    }
+                    // console.log(makeHTML);
+                    document.getElementById(tempBtnId+"List").innerHTML = "";
+                    document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
+                })
+            }
+        }            
+    }
+
     // str内の一番最後のスペースのインデックスからstr内の一番最後の指定wordのインデックスまでに含まれる文字を返す 
     static getAmount(str,word){
         let start;
@@ -362,9 +403,9 @@ class Control{
         let valueTag = document.getElementById(valueBtnId);
         if (valueTag.innerHTML !== value){
             valueTag.innerHTML = value;
-            console.log(index);
+            // console.log(index);
             for (let i = index+1; i < btns.length; i++){
-                console.log(btns[i]["btnId"]);
+                // console.log(btns[i]["btnId"]);
                 View.initializeBtn(btns[i]["btnId"]);
             }
             // Control.displayModel(type, tag, "Please select", valueBtnId, modelBtnId);
@@ -373,6 +414,7 @@ class Control{
             View.makeDropDownBrandList(value.toLowerCase() ,"step4",btns);
             View.makeDropDownAmount(value.toLowerCase(), "step4", btns, "storageAmountBtn", "B")
         }
+        if (View.doesInvolve(valueBtnId, "Brand")) View.makeDropDownModelList(type, tag, btns);
         // View.makeStep2View();
     }
 
