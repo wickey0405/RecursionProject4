@@ -84,6 +84,7 @@ class View{
                         makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", check[i]);
                     }
                     // console.log(makeHTML);
+                    document.getElementById(tempBtnId+"List").innerHTML = "";
                     document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
                 })
             }
