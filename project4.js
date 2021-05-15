@@ -193,9 +193,9 @@ class View{
                     else if (voluem === "M") listMB.push(parseFloat(check[i].substring(0, check[i].lastIndexOf("B") - 1)));
                 }
                 
-                listTB.sort((a, b) => a - b);
-                listGB.sort((a, b) => a - b);
-                listMB.sort((a, b) => a - b);
+                listTB.sort((a, b) => b - a);
+                listGB.sort((a, b) => b - a);
+                listMB.sort((a, b) => b - a);
                 
                 listTB = View.addUnit(listTB, "TB");
                 listGB = View.addUnit(listGB, "GB");
