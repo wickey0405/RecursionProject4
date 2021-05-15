@@ -21,7 +21,7 @@ class View{
 
     static initializeBtn(btnId){
         let btnDisplay = document.getElementById(btnId);
-        btnDisplay.innerHTML = "Please select";
+        btnDisplay.innerHTML = "-----";
     }
 
     static makeEmptyButtonHTML(item, name){
@@ -29,7 +29,7 @@ class View{
             <p class="mx-3 font-item">${item}</p>
             <div class="dropdown mb-3">
                 <button id="${name}" role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Please select
+                    -----
                 </button>
                 <ui id="${name}List" class="dropdown-menu" aria-labelledby="${name}">
                     
@@ -55,7 +55,7 @@ class View{
 
     static makeDropDownStep(type, tag, btns){
         config[tag].innerHTML += View.makeDropDown(btns);
-        View.makeDropDownBrandList(type, tag, btns);
+        
     }
 
     static makeDropDownListHTML(f , tempBtnId, type, tag, item, currentItem){
@@ -68,13 +68,25 @@ class View{
         let check = [];
         let makeHTML = "";
 
+        let selectedAmount;
+        let limitation = true;  
+
         for (let i = 0; i < btns.length; i++){
             let tempBtnId = btns[i]["btnId"];
+
+            if ((tag === "step3" || tag === "step4") && View.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
+
             if (View.doesInvolve(tempBtnId, "Brand")){
                 fetch(config.url+type).then(response=>response.json()).then(data=>{
                     for (let tempData in data){
                         let current = data[tempData];
-                        if (check.indexOf(current["Brand"]) === -1){
+                        let currentAmount;
+
+                        if (tag === "step3") currentAmount = View.getAmount(current["Model"], "x");
+                        if (tag === "step4") currentAmount = View.getAmount(current["Model"], "B");
+                        limitation = currentAmount === selectedAmount;
+
+                        if (check.indexOf(current["Brand"]) === -1 && limitation){
                             check.push(current["Brand"]);
                             // makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", current["Brand"]);
                         }
@@ -126,7 +138,8 @@ class View{
                     }
                     // console.log(makeHTML);
                     document.getElementById(tempBtnId+"List").innerHTML = "";
-                    document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
+                    if (makeHTML !== "") document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
+                    else document.getElementById(tempBtnId).innerHTML = "None";
                 })
             }
         }            
@@ -287,7 +300,10 @@ class View{
                         "item":"Model",
                         "btnId":"cpuModelBtn"
                     }];
-        if(flag) View.makeDropDownStep("cpu", "step1",btns);
+        if(flag){
+            View.makeDropDownStep("cpu", "step1",btns);
+            View.makeDropDownBrandList("cpu", "step1", btns);
+        }
         return btns;
     }
 
@@ -300,7 +316,10 @@ class View{
                         "item":"Model",
                         "btnId":"gpuModelBtn"
                     }];
-        if(flag) View.makeDropDownStep("gpu" , "step2",btns);
+        if(flag){
+            View.makeDropDownStep("gpu" , "step2",btns);
+            View.makeDropDownBrandList("gpu" , "step2", btns);
+        }
         return btns;
     }
 
@@ -320,6 +339,7 @@ class View{
         if (flag){
             View.makeDropDownStep("ram" , "step3",btns);
             View.makeDropDownAmount("ram", "step3", btns, "ramAmountBtn", "x");
+            View.makeDropDownBrandList("ram", "step3", btns);
         }
         return btns;
     }
@@ -344,6 +364,7 @@ class View{
         if(flag){
             View.makeDropDownStep("dummy" ,"step4",btns);
             View.makeDropDownFirstStep4("dummy", "step4", btns);
+            View.makeDropDownBrandList("dummy", "step4", btns);
             // View.makeDropDownAmount("dummy", "step4", btns, "storageAmountBtn", "TB");
             // View.makeDropDownAmount("dummy", "step4", btns, "storageAmountBtn", "GB");
         }
@@ -415,6 +436,7 @@ class Control{
             View.makeDropDownBrandList(value.toLowerCase() ,"step4",btns);
             View.makeDropDownAmount(value.toLowerCase(), "step4", btns, "storageAmountBtn", "B")
         }
+        if (View.doesInvolve(valueBtnId, "Amount")) View.makeDropDownBrandList(type, tag, btns);
         if (View.doesInvolve(valueBtnId, "Brand")) View.makeDropDownModelList(type, tag, btns);
         // View.makeStep2View();
     }
