@@ -596,45 +596,45 @@ class Control{
     //     // View.makeStep2View();
     // }
 
-    static displayModel(type, tag, model, brandBtnId, modelBtnId){
-        let modelName = document.getElementById(modelBtnId);
-        modelName.innerHTML = model;
+    // static displayModel(type, tag, model, brandBtnId, modelBtnId){
+    //     let modelName = document.getElementById(modelBtnId);
+    //     modelName.innerHTML = model;
 
-        // console.log(brand);
-        // Control.screening();
-    }
+    //     // console.log(brand);
+    //     // Control.screening();
+    // }
 
-    static screening(){
-        let selectedBrand = document.getElementById("step1Btn").innerHTML;
-        let selectedModel = document.getElementById("step2Btn").innerHTML;
-        let selectedPowerConsumptionWh = "";
-        let passBatterys = [];
+    // static screening(){
+    //     let selectedBrand = document.getElementById("step1Btn").innerHTML;
+    //     let selectedModel = document.getElementById("step2Btn").innerHTML;
+    //     let selectedPowerConsumptionWh = "";
+    //     let passBatterys = [];
 
-        for (let i = 0; i < camera.length; i++){
-            if (selectedBrand === camera[i][item] && selectedModel === camera[i].model){
-                selectedPowerConsumptionWh = camera[i].powerConsumptionWh;
-                break
-            }
-        }
+    //     for (let i = 0; i < camera.length; i++){
+    //         if (selectedBrand === camera[i][item] && selectedModel === camera[i].model){
+    //             selectedPowerConsumptionWh = camera[i].powerConsumptionWh;
+    //             break
+    //         }
+    //     }
 
-        for (let j = 0; j < battery.length; j++){
-            if ((battery[j].maxDraw * battery[j].endVoltage - document.getElementById("accessoryPowerConsumption").value) >= selectedPowerConsumptionWh){
-                battery[j]["usage"] = Math.round((battery[j].capacityAh * battery[j].voltage / (selectedPowerConsumptionWh + document.getElementById("accessoryPowerConsumption").value))*10)/10;
-                passBatterys.push(battery[j]);
-            }
-        }
-        // console.log(passBatterys);
-        View.makeResultTable(passBatterys);
-    }
+    //     for (let j = 0; j < battery.length; j++){
+    //         if ((battery[j].maxDraw * battery[j].endVoltage - document.getElementById("accessoryPowerConsumption").value) >= selectedPowerConsumptionWh){
+    //             battery[j]["usage"] = Math.round((battery[j].capacityAh * battery[j].voltage / (selectedPowerConsumptionWh + document.getElementById("accessoryPowerConsumption").value))*10)/10;
+    //             passBatterys.push(battery[j]);
+    //         }
+    //     }
+    //     // console.log(passBatterys);
+    //     View.makeResultTable(passBatterys);
+    // }
 
-    static limitOfStep3(){
-        if (document.getElementById("accessoryPowerConsumption").value >= 100){
-            document.getElementById("accessoryPowerConsumption").value = 100;
-        } else if (document.getElementById("accessoryPowerConsumption").value <= 0){
-            document.getElementById("accessoryPowerConsumption").value = 0;
-        }
-        Control.screening();
-    }
+    // static limitOfStep3(){
+    //     if (document.getElementById("accessoryPowerConsumption").value >= 100){
+    //         document.getElementById("accessoryPowerConsumption").value = 100;
+    //     } else if (document.getElementById("accessoryPowerConsumption").value <= 0){
+    //         document.getElementById("accessoryPowerConsumption").value = 0;
+    //     }
+    //     Control.screening();
+    // }
 }
 
 function initializeApp(){
