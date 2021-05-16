@@ -266,9 +266,10 @@ class View{
         target.innerHTML = `
             <button id="addPCBtn" class="btn btn-primary" type="submit">add PC</button>
         `
+        let count = 1;
         let targetBtn = document.getElementById("addPCBtn");
         targetBtn.addEventListener("click",()=>{
-            if(View.isSelectedAll()) View.makeResultTable(View.getSelectedValues());
+            if(View.isSelectedAll()) count = View.makeResultTable(View.getSelectedValues(),count);
             else alert("Please select all items.")
         });
     }
@@ -407,10 +408,57 @@ class View{
         return btns;
     }
 
-    static makeResultTable(pcInfo){
-        let resultHTML = "";
+    static calcScore(pcInfo, cpuK, gpuK, ramK, storageK, type, id){
+        let value = 0;
+        let scoreTag = document.getElementById(id);
+        fetch(config.url+"cpu").then(response=>response.json()).then(datas=>{
+            for (let data in datas){
+                let curr = datas[data];
+                if (curr["Brand"] === pcInfo["cpuBrandBtn"] && curr["Model"] === pcInfo["cpuModelBtn"]){
+                    value += curr["Benchmark"] * cpuK;
+                    // scoreTag.innerHTML += value;
+                    console.log(value);
+                }
+            }           
+        }).then(()=>{
+            fetch(config.url+"gpu").then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["gpuBrandBtn"] && curr["Model"] === pcInfo["gpuModelBtn"]){
+                        value += curr["Benchmark"] * gpuK;
+                        // scoreTag.innerHTML += value;
+                        console.log(value);
+                    }
+                }
+            })    
+        }).then(()=>{
+            fetch(config.url+"ram").then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["ramBrandBtn"] && curr["Model"] === pcInfo["ramModelBtn"]){
+                        value += curr["Benchmark"] * ramK;
+                        // scoreTag.innerHTML += value;
+                        console.log(value);
+                    }
+                }
+            })    
+        }).then(()=>{
+            fetch(config.url+type).then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["storageBrandBtn"] && curr["Model"] === pcInfo["storageModelBtn"]){
+                        value += curr["Benchmark"] * storageK;
+                        scoreTag.innerHTML += Math.round(value) + "%";
+                        console.log(value);
+                    }
+                }
+            })    
+        });
 
-        console.log(pcInfo);
+    }
+
+    static makeResultTable(pcInfo,count){
+        let resultHTML = "";
             
         resultHTML += `
             <tr>
@@ -442,12 +490,12 @@ class View{
             </tr>
         `
         
-        config.result.innerHTML = `
-        <p class="ml-3 mt-5 font-step">Your PC Spec!!</p>
+        config.result.innerHTML += `
+        <p class="ml-3 mt-5 font-step">★Your PC${count} Spec!!</p>
         <table class="table table-bordered ml-3 table-dark">
             <thead>
                 <tr>
-                <th scope="col">#</th>
+                <th scope="col">PC${count}</th>
                 <th scope="col">Type</th>
                 <th scope="col">Brand</th>
                 <th scope="col">Model</th>
@@ -457,7 +505,17 @@ class View{
                 ${resultHTML}
             </tbody>
         </table>
+
+        <p id="gameScore${count}" class="ml-5 mt-2 font-step">Gaming: </p>
+        <p id="workScore${count}" class="ml-5 mt-2 font-step">Working: </p>
         `
+
+        let storageType = document.getElementById("storageTypeBtn").innerHTML;
+        console.log(storageType);
+        View.calcScore(pcInfo, 0.6, 0.25, 0.125, 0.025, storageType.toLowerCase(), "gameScore"+count);
+        View.calcScore(pcInfo, 0.25, 0.6, 0.1, 0.05, storageType.toLowerCase(), "workScore"+count);
+        count++;
+        return count;
     }
 }
 
@@ -626,6 +684,7 @@ function initializeApp(){
         </div>
     `
 }
+
 // console.log(target);
 View.makeTitle();
 View.makeStep1View(true);
@@ -633,3 +692,10 @@ View.makeStep2View(true);
 View.makeStep3View(true);
 View.makeStep4View(true);
 View.makeAddPCBtnView();
+
+fetch(config.url + "cpu").then(response=>response.json()).then(datas=>{
+    for(let data in datas){
+        let current = datas[data];
+        // console.log(current);
+    }
+})
