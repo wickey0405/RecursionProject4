@@ -237,6 +237,42 @@ class View{
         document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
         
     }
+
+    static getSelectedValues(){
+        let ans = {};
+        let btnIds = document.getElementById("target").querySelectorAll(".btn");
+        
+        // addPCのinnerHTMLは無視するためにbtnIds.length-1まで
+        for (let i = 0; i < btnIds.length-1; i++){
+            ans[btnIds[i].id] = btnIds[i].innerHTML;
+            // console.log(btnIds[i].id + ", " + btnIds[i].innerHTML);
+        }
+        return ans;
+    }
+
+    static isSelectedAll(){
+        let values = View.getSelectedValues();
+        for (let value in values){
+            let current = values[value];
+            // console.log(value + ", " + current);
+            if (current.indexOf("-----") !== -1) return false;
+        }
+        return true;
+    }
+
+    static makeAddPCBtnView(){
+        let target = document.getElementById("addPC");
+        target.classList.add("ml-3", "mt-5");
+        target.innerHTML = `
+            <button id="addPCBtn" class="btn btn-primary" type="submit">add PC</button>
+        `
+        let targetBtn = document.getElementById("addPCBtn");
+        targetBtn.addEventListener("click",()=>{
+            if(View.isSelectedAll()) View.makeResultTable(View.getSelectedValues());
+            else alert("Please select all items.")
+        });
+    }
+
     // static makeDropDownStep3(type ,tag ,ramAmountBtnId , brandBtnId, modelBtnId){
 
     //     let check = [];
@@ -294,7 +330,7 @@ class View{
     static makeStep1View(flag){
         let btns = [{
                         "item":"Brand",
-                        "btnId":"cupBrandBtn"
+                        "btnId":"cpuBrandBtn"
                     },
                     {
                         "item":"Model",
@@ -371,27 +407,50 @@ class View{
         return btns;
     }
 
-    static makeResultTable(passBatterys){
+    static makeResultTable(pcInfo){
         let resultHTML = "";
 
-        for (let i = 0; i < passBatterys.length; i++){
-            resultHTML += `
-                <tr>
-                <th scope="row">${i}</th>
-                <td>${passBatterys[i].batteryName}</td>
-                <td>Estimated ${passBatterys[i].usage} hours on selected setup</td>
-                </tr>
-            `
-        }
+        console.log(pcInfo);
+            
+        resultHTML += `
+            <tr>
+            <th scope="row">CPU</th>
+            <td>-</td>
+            <td>${pcInfo["cpuBrandBtn"]}</td>
+            <td>${pcInfo["cpuModelBtn"]}</td>
+            </tr>
+
+            <tr>
+            <th scope="row">GPU</th>
+            <td>-</td>
+            <td>${pcInfo["gpuBrandBtn"]}</td>
+            <td>${pcInfo["gpuModelBtn"]}</td>
+            </tr>
+
+            <tr>
+            <th scope="row">RAM</th>
+            <td>-</td>
+            <td>${pcInfo["ramBrandBtn"]}</td>
+            <td>${pcInfo["ramModelBtn"]}</td>
+            </tr>
+
+            <tr>
+            <th scope="row">Storage</th>
+            <td>${pcInfo["storageTypeBtn"]}</td>
+            <td>${pcInfo["storageBrandBtn"]}</td>
+            <td>${pcInfo["storageModelBtn"]}</td>
+            </tr>
+        `
         
         config.result.innerHTML = `
-        <p class="ml-3 font-step">step4: Choose Your Battery</p>
+        <p class="ml-3 mt-5 font-step">Your PC Spec!!</p>
         <table class="table table-bordered ml-3 table-dark">
             <thead>
                 <tr>
                 <th scope="col">#</th>
-                <th scope="col">Battery Name</th>
-                <th scope="col">Usage</th>
+                <th scope="col">Type</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Model</th>
                 </tr>
             </thead>
             <tbody>
@@ -557,6 +616,10 @@ function initializeApp(){
                 </div>
             </div>
             <div class="row">
+                <div id="addPC">
+                </div>
+            </div>
+            <div class="row">
                 <div id="result">
                 </div>
             </div>
@@ -569,10 +632,4 @@ View.makeStep1View(true);
 View.makeStep2View(true);
 View.makeStep3View(true);
 View.makeStep4View(true);
-
-fetch(config.url+"hdd").then(response=>response.json()).then(data=>{
-    for (let dataBlock in data){
-        let current = data[dataBlock];
-        // console.log(current);
-    }
-});
+View.makeAddPCBtnView();
