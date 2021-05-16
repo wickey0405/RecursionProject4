@@ -48,14 +48,8 @@ class View{
         return makeHTML;
     }
 
-    // (string1, string2) => boolean  string1にstring2が含まれるかどうか
-    static doesInvolve(string1, string2){
-        return (string1.indexOf(string2) !== -1);
-    }
-
     static makeDropDownStep(type, tag, btns){
         config[tag].innerHTML += View.makeDropDown(btns);
-        
     }
 
     static makeDropDownListHTML(f , tempBtnId, type, tag, item, currentItem){
@@ -74,28 +68,26 @@ class View{
         for (let i = 0; i < btns.length; i++){
             let tempBtnId = btns[i]["btnId"];
 
-            if ((tag === "step3" || tag === "step4") && View.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
+            if ((tag === "step3" || tag === "step4") && Control.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
 
-            if (View.doesInvolve(tempBtnId, "Brand")){
+            if (Control.doesInvolve(tempBtnId, "Brand")){
                 fetch(config.url+type).then(response=>response.json()).then(data=>{
                     for (let tempData in data){
                         let current = data[tempData];
                         let currentAmount;
 
-                        if (tag === "step3") currentAmount = View.getAmount(current["Model"], "x");
-                        if (tag === "step4") currentAmount = View.getAmount(current["Model"], "B");
+                        if (tag === "step3") currentAmount = Control.getAmount(current["Model"], "x");
+                        if (tag === "step4") currentAmount = Control.getAmount(current["Model"], "B");
                         limitation = currentAmount === selectedAmount;
 
                         if (check.indexOf(current["Brand"]) === -1 && limitation){
                             check.push(current["Brand"]);
-                            // makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", current["Brand"]);
                         }
                     }
                     check.sort();
                     for(let i = 0; i < check.length; i++){
                         makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", check[i]);
                     }
-                    // console.log(makeHTML);
                     document.getElementById(tempBtnId+"List").innerHTML = "";
                     document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
                 })
@@ -113,72 +105,46 @@ class View{
         for (let i = 0; i < btns.length; i++){
             let tempBtnId = btns[i]["btnId"];
 
-            if (View.doesInvolve(tempBtnId, "Brand")) selectedBrand = document.getElementById(btns[i]["btnId"]).innerHTML;
+            if (Control.doesInvolve(tempBtnId, "Brand")) selectedBrand = document.getElementById(btns[i]["btnId"]).innerHTML;
 
-            if ((tag === "step3" || tag === "step4") && View.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
+            if ((tag === "step3" || tag === "step4") && Control.doesInvolve(tempBtnId, "Amount")) selectedAmount = document.getElementById(btns[i]["btnId"]).innerHTML;
 
-            if (View.doesInvolve(tempBtnId, "Model")){
+            if (Control.doesInvolve(tempBtnId, "Model")){
                 fetch(config.url+type).then(response=>response.json()).then(data=>{
                     for (let tempData in data){
                         let current = data[tempData];
                         let currentAmount;
 
-                        if (tag === "step3") currentAmount = View.getAmount(current["Model"], "x");
-                        if (tag === "step4") currentAmount = View.getAmount(current["Model"], "B");
+                        if (tag === "step3") currentAmount = Control.getAmount(current["Model"], "x");
+                        if (tag === "step4") currentAmount = Control.getAmount(current["Model"], "B");
                         limitation = currentAmount === selectedAmount;
 
                         if (check.indexOf(current["Model"]) === -1 && current["Brand"] === selectedBrand && limitation){
                             check.push(current["Model"]);
-                            // makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Brand", current["Brand"]);
                         }
                     }
                     check.sort();
                     for(let i = 0; i < check.length; i++){
                         makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Model", check[i]);
                     }
-                    // console.log(makeHTML);
                     document.getElementById(tempBtnId+"List").innerHTML = "";
-                    if (makeHTML !== "") document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
-                    else document.getElementById(tempBtnId).innerHTML = "None";
+                    document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
                 })
             }
         }            
     }
 
-    // str内の一番最後のスペースのインデックスからstr内の一番最後の指定wordのインデックスまでに含まれる文字を返す 
-    static getAmount(str,word){
-        let start;
-        let end = str.lastIndexOf(word);
-        if (end === -1) return null;
+    static makeDropDownFirstStep4(type, tag, btns){
+        let makeHTML = "";
+        let tempBtnId = "storageTypeBtn";
 
-        if (word === "B"){
-            if (str.charAt(str.lastIndexOf(word)-1) === "M"){
-                end = str.substring(0, str.lastIndexOf(word)-1).lastIndexOf(word);
-            }
-        }
-        for (let i = end; i >= 0; i--){
-            if (str.charAt(i) === " "){
-                start = i+1;
-                break;
-            }
-        }
+        makeHTML += View.makeDropDownListHTML("display" , tempBtnId, type, tag,"storageType" , "HDD");
+        makeHTML += View.makeDropDownListHTML("display" , tempBtnId, type, tag, "storageType", "SSD");
+        document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
         
-        if (str.charAt(start) === "(") start++;
-        // console.log(start + ", " + end);
-        if (word === "B") end++;
-        let amount = str.substring(start,end);
-        // console.log(amount);
-        return amount;
     }
 
-    static addUnit(valueList, unit){
-        let ans = [];
-        for(let i = 0; i < valueList.length; i++){
-            ans.push(valueList[i] + unit);
-        }
-        return ans;
-    }
-
+    // RamやStorageの個数や容量を取得し、リストとして格納する
     static makeDropDownAmount(type, tag, btns, btnId, word){
         let check = [];
         let makeHTML = "";
@@ -187,10 +153,9 @@ class View{
         fetch(config.url+type).then(response=>response.json()).then(data=>{
             for (let tempData in data){
                 let current = data[tempData];
-                let amount = View.getAmount(current["Model"], word);
+                let amount = Control.getAmount(current["Model"], word);
                 if (check.indexOf(amount) === -1){
                     check.push(amount);
-                    // makeHTML += View.makeDropDownListHTML("display", tempBtnId, type, tag, "Amount", amount);
                 }
             }
             check.sort();
@@ -211,13 +176,12 @@ class View{
                 listGB.sort((a, b) => b - a);
                 listMB.sort((a, b) => b - a);
                 
-                listTB = View.addUnit(listTB, "TB");
-                listGB = View.addUnit(listGB, "GB");
-                listMB = View.addUnit(listMB, "MB");
+                listTB = Control.addUnit(listTB, "TB");
+                listGB = Control.addUnit(listGB, "GB");
+                listMB = Control.addUnit(listMB, "MB");
 
                 let tempList = listTB.concat(listGB);
                 check = tempList.concat(listMB);
-                // console.log(check);
             }
             
             for(let i = 0; i < check.length; i++){
@@ -228,38 +192,7 @@ class View{
         })
     }
 
-    static makeDropDownFirstStep4(type, tag, btns){
-        let makeHTML = "";
-        let tempBtnId = "storageTypeBtn";
-
-        makeHTML += View.makeDropDownListHTML("display" , tempBtnId, type, tag,"storageType" , "HDD");
-        makeHTML += View.makeDropDownListHTML("display" , tempBtnId, type, tag, "storageType", "SSD");
-        document.getElementById(tempBtnId+"List").innerHTML += makeHTML;
-        
-    }
-
-    static getSelectedValues(){
-        let ans = {};
-        let btnIds = document.getElementById("target").querySelectorAll(".btn");
-        
-        // addPCのinnerHTMLは無視するためにbtnIds.length-1まで
-        for (let i = 0; i < btnIds.length-1; i++){
-            ans[btnIds[i].id] = btnIds[i].innerHTML;
-            // console.log(btnIds[i].id + ", " + btnIds[i].innerHTML);
-        }
-        return ans;
-    }
-
-    static isSelectedAll(){
-        let values = View.getSelectedValues();
-        for (let value in values){
-            let current = values[value];
-            // console.log(value + ", " + current);
-            if (current.indexOf("-----") !== -1) return false;
-        }
-        return true;
-    }
-
+    // AddPCボタンの作成
     static makeAddPCBtnView(){
         let target = document.getElementById("addPC");
         target.classList.add("ml-3", "mt-5");
@@ -269,64 +202,10 @@ class View{
         let count = 1;
         let targetBtn = document.getElementById("addPCBtn");
         targetBtn.addEventListener("click",()=>{
-            if(View.isSelectedAll()) count = View.makeResultTable(View.getSelectedValues(),count);
+            if(Control.isSelectedAll()) count = View.makeResultTable(Control.getSelectedValues(),count);
             else alert("Please select all items.")
         });
     }
-
-    // static makeDropDownStep3(type ,tag ,ramAmountBtnId , brandBtnId, modelBtnId){
-
-    //     let check = [];
-    //     let makeHTML = "";
-        
-    //     fetch(config.url+type).then(response=>response.json()).then(data=>{
-    //         for (let tmp in data){
-    //             let currentTmp = data[tmp];
-    //             let amount = View.getAmountOfRam(currentTmp["Model"]);
-
-    //             console.log(amount);
-
-    //             if (check.indexOf(amount) === -1){
-    //                 check.push(amount);
-    //                 makeHTML += `
-    //                     <li><button class="dropdown-item" type="button" id=${ramAmountBtnId} onclick="Control.displayAmountRam('${type}', '${tag}' ,'${amount}','${ramAmountBtnId}','${brandBtnId}','${modelBtnId}')">${amount}</button></li>`;
-    //             }
-    //         }
-            
-    //         config[tag].innerHTML += `
-    //             <p class="mx-3 font-item">Brand</p>
-    //             <div class="dropdown mb-3">
-    //                 <button id=${ramAmountBtnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    //                     Please select
-    //                 </button>
-    //                 <ui class="dropdown-menu" aria-labelledby="${ramAmountBtnId}">
-    //                     ${makeHTML}
-    //                 </ui>
-    //             </div>
-
-    //             <p class="mx-3 font-item">Brand</p>
-    //             <div class="dropdown mb-3">
-    //                 <button id=${brandBtnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    //                     Please select
-    //                 </button>
-    //                 <ui class="dropdown-menu" aria-labelledby="${brandBtnId}">
-                        
-    //                 </ui>
-    //             </div>
-
-    //             <p class="mx-3 font-item">Model</p>
-    //             <div class="dropdown mb-3">
-    //                 <button id=${modelBtnId} role="button" class="btn btn-dark border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    //                     Please select
-    //                 </button>
-    //                 <ui class="dropdown-menu" aria-labelledby="${modelBtnId}">
-                        
-    //                 </ui>
-    //             </div>
-    //         `;
-    //     });
-        
-    // }
 
     static makeStep1View(flag){
         let btns = [{
@@ -402,61 +281,11 @@ class View{
             View.makeDropDownStep("dummy" ,"step4",btns);
             View.makeDropDownFirstStep4("dummy", "step4", btns);
             View.makeDropDownBrandList("dummy", "step4", btns);
-            // View.makeDropDownAmount("dummy", "step4", btns, "storageAmountBtn", "TB");
-            // View.makeDropDownAmount("dummy", "step4", btns, "storageAmountBtn", "GB");
         }
         return btns;
     }
 
-    static calcScore(pcInfo, cpuK, gpuK, ramK, storageK, type, id){
-        let value = 0;
-        let scoreTag = document.getElementById(id);
-        fetch(config.url+"cpu").then(response=>response.json()).then(datas=>{
-            for (let data in datas){
-                let curr = datas[data];
-                if (curr["Brand"] === pcInfo["cpuBrandBtn"] && curr["Model"] === pcInfo["cpuModelBtn"]){
-                    value += curr["Benchmark"] * cpuK;
-                    // scoreTag.innerHTML += value;
-                    console.log(value);
-                }
-            }           
-        }).then(()=>{
-            fetch(config.url+"gpu").then(response=>response.json()).then(datas=>{
-                for (let data in datas){
-                    let curr = datas[data];
-                    if (curr["Brand"] === pcInfo["gpuBrandBtn"] && curr["Model"] === pcInfo["gpuModelBtn"]){
-                        value += curr["Benchmark"] * gpuK;
-                        // scoreTag.innerHTML += value;
-                        console.log(value);
-                    }
-                }
-            })    
-        }).then(()=>{
-            fetch(config.url+"ram").then(response=>response.json()).then(datas=>{
-                for (let data in datas){
-                    let curr = datas[data];
-                    if (curr["Brand"] === pcInfo["ramBrandBtn"] && curr["Model"] === pcInfo["ramModelBtn"]){
-                        value += curr["Benchmark"] * ramK;
-                        // scoreTag.innerHTML += value;
-                        console.log(value);
-                    }
-                }
-            })    
-        }).then(()=>{
-            fetch(config.url+type).then(response=>response.json()).then(datas=>{
-                for (let data in datas){
-                    let curr = datas[data];
-                    if (curr["Brand"] === pcInfo["storageBrandBtn"] && curr["Model"] === pcInfo["storageModelBtn"]){
-                        value += curr["Benchmark"] * storageK;
-                        scoreTag.innerHTML += Math.round(value) + "%";
-                        console.log(value);
-                    }
-                }
-            })    
-        });
-
-    }
-
+    // PC SPECを表で表示する
     static makeResultTable(pcInfo,count){
         let resultHTML = "";
             
@@ -511,15 +340,73 @@ class View{
         `
 
         let storageType = document.getElementById("storageTypeBtn").innerHTML;
-        console.log(storageType);
-        View.calcScore(pcInfo, 0.6, 0.25, 0.125, 0.025, storageType.toLowerCase(), "gameScore"+count);
-        View.calcScore(pcInfo, 0.25, 0.6, 0.1, 0.05, storageType.toLowerCase(), "workScore"+count);
+        Control.calcScore(pcInfo, 0.6, 0.25, 0.125, 0.025, storageType.toLowerCase(), "gameScore"+count);
+        Control.calcScore(pcInfo, 0.25, 0.6, 0.1, 0.05, storageType.toLowerCase(), "workScore"+count);
         count++;
         return count;
     }
 }
 
 class Control{
+    // 選択された項目の値をすべて取得。
+    static getSelectedValues(){
+        let ans = {};
+        let btnIds = document.getElementById("target").querySelectorAll(".btn");
+        
+        // addPCのinnerHTMLは無視するためにbtnIds.length-1まで
+        for (let i = 0; i < btnIds.length-1; i++){
+            ans[btnIds[i].id] = btnIds[i].innerHTML;
+        }
+        return ans;
+    }
+
+    // 指定項目が全部InputされているかどうかのBoolean値を返す
+    static isSelectedAll(){
+        let values = Control.getSelectedValues();
+        for (let value in values){
+            let current = values[value];
+            if (current.indexOf("-----") !== -1) return false;
+        }
+        return true;
+    }
+
+    // (string1, string2) => boolean  string1にstring2が含まれるかどうか
+    static doesInvolve(string1, string2){
+        return (string1.indexOf(string2) !== -1);
+    }
+
+    // str内の一番最後のスペースのインデックスからstr内の一番最後の指定wordのインデックスまでに含まれる文字を返す 
+    static getAmount(str,word){
+        let start;
+        let end = str.lastIndexOf(word);
+        if (end === -1) return null;
+
+        if (word === "B"){
+            if (str.charAt(str.lastIndexOf(word)-1) === "M"){
+                end = str.substring(0, str.lastIndexOf(word)-1).lastIndexOf(word);
+            }
+        }
+        for (let i = end; i >= 0; i--){
+            if (str.charAt(i) === " "){
+                start = i+1;
+                break;
+            }
+        }
+        
+        if (word === "B") end++;
+        let amount = str.substring(start,end);
+        return amount;
+    }
+
+    // valueList配列の要素にunitを加えて、配列で返す
+    static addUnit(valueList, unit){
+        let ans = [];
+        for(let i = 0; i < valueList.length; i++){
+            ans.push(valueList[i] + unit);
+        }
+        return ans;
+    }
+
     static display(type, tag, item , value){
         let valueBtnId;
         // 文字リテラルでbtnsをうまく渡せないので再構築...
@@ -534,7 +421,7 @@ class Control{
             let tempBtnId = btns[i]["btnId"];
             
 
-            if (View.doesInvolve(tempBtnId, item)){
+            if (Control.doesInvolve(tempBtnId, item)){
                 valueBtnId = tempBtnId;
                 index = i;
             }
@@ -542,99 +429,62 @@ class Control{
         let valueTag = document.getElementById(valueBtnId);
         if (valueTag.innerHTML !== value){
             valueTag.innerHTML = value;
-            // console.log(index);
             for (let i = index+1; i < btns.length; i++){
-                // console.log(btns[i]["btnId"]);
                 View.initializeBtn(btns[i]["btnId"]);
             }
-            // Control.displayModel(type, tag, "Please select", valueBtnId, modelBtnId);
         }
         if (valueBtnId === "storageTypeBtn"){
             View.makeDropDownBrandList(value.toLowerCase() ,"step4",btns);
             View.makeDropDownAmount(value.toLowerCase(), "step4", btns, "storageAmountBtn", "B")
         }
-        if (View.doesInvolve(valueBtnId, "Amount")) View.makeDropDownBrandList(type, tag, btns);
-        if (View.doesInvolve(valueBtnId, "Brand")) View.makeDropDownModelList(type, tag, btns);
-        // View.makeStep2View();
+        if (Control.doesInvolve(valueBtnId, "Amount")) View.makeDropDownBrandList(type, tag, btns);
+        if (Control.doesInvolve(valueBtnId, "Brand")) View.makeDropDownModelList(type, tag, btns);
     }
 
-    // static displayBrand(type, tag, brand, btns){
-    //     let brandBtnId;
-    //     btns = config[tag].querySelectorAll(".btn");
-    //     for (let i = 0; i < btns.length; i++){
-    //         let tempBtnId = btns[i].id;
-            
-    //         if (View.doesInvolve(tempBtnId, "Brand")){
-    //             brandBtnId = tempBtnId;
-    //         }
-    //     }
-        
-    //     let brandName = document.getElementById(brandBtnId);
-    //     if (brandName.innerHTML !== brand){
-    //         brandName.innerHTML = brand;
-    //         Control.displayModel(type, tag, "Please select", brandBtnId, modelBtnId);
-    //     }
-    //     // View.makeStep2View();
-    // }
+    // Scoreの計算。
+    static calcScore(pcInfo, cpuK, gpuK, ramK, storageK, type, id){
+        let value = 0;
+        let scoreTag = document.getElementById(id);
+        fetch(config.url+"cpu").then(response=>response.json()).then(datas=>{
+            for (let data in datas){
+                let curr = datas[data];
+                if (curr["Brand"] === pcInfo["cpuBrandBtn"] && curr["Model"] === pcInfo["cpuModelBtn"]){
+                    value += curr["Benchmark"] * cpuK;
+                }
+            }           
+        }).then(()=>{
+            fetch(config.url+"gpu").then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["gpuBrandBtn"] && curr["Model"] === pcInfo["gpuModelBtn"]){
+                        value += curr["Benchmark"] * gpuK;
+                    }
+                }
+            })    
+        }).then(()=>{
+            fetch(config.url+"ram").then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["ramBrandBtn"] && curr["Model"] === pcInfo["ramModelBtn"]){
+                        value += curr["Benchmark"] * ramK;
+                    }
+                }
+            })    
+        }).then(()=>{
+            fetch(config.url+type).then(response=>response.json()).then(datas=>{
+                for (let data in datas){
+                    let curr = datas[data];
+                    if (curr["Brand"] === pcInfo["storageBrandBtn"] && curr["Model"] === pcInfo["storageModelBtn"]){
+                        value += curr["Benchmark"] * storageK;
+                        scoreTag.innerHTML += Math.round(value) + "%";
+                        // console.log(value);
+                    }
+                }
+            })    
+        });
 
-    // static displayRamAmount(type, tag, amount, btns){
-    //     let amountBtnId;
-    //     btns = config[tag].querySelectorAll(".btn");
-    //     for (let i = 0; i < btns.length; i++){
-    //         let tempBtnId = btns[i].id;
-            
-    //         if (View.doesInvolve(tempBtnId, "Amount")){
-    //             amountBtnId = tempBtnId;
-    //         }
-    //     }
-        
-    //     let amountTag = document.getElementById(amountBtnId);
-    //     if (amountTag.innerHTML !== amount){
-    //         amountTag.innerHTML = amount;
-    //         Control.displayModel(type, tag, "Please select", amountBtnId, modelBtnId);
-    //     }
-    //     // View.makeStep2View();
-    // }
+    }
 
-    // static displayModel(type, tag, model, brandBtnId, modelBtnId){
-    //     let modelName = document.getElementById(modelBtnId);
-    //     modelName.innerHTML = model;
-
-    //     // console.log(brand);
-    //     // Control.screening();
-    // }
-
-    // static screening(){
-    //     let selectedBrand = document.getElementById("step1Btn").innerHTML;
-    //     let selectedModel = document.getElementById("step2Btn").innerHTML;
-    //     let selectedPowerConsumptionWh = "";
-    //     let passBatterys = [];
-
-    //     for (let i = 0; i < camera.length; i++){
-    //         if (selectedBrand === camera[i][item] && selectedModel === camera[i].model){
-    //             selectedPowerConsumptionWh = camera[i].powerConsumptionWh;
-    //             break
-    //         }
-    //     }
-
-    //     for (let j = 0; j < battery.length; j++){
-    //         if ((battery[j].maxDraw * battery[j].endVoltage - document.getElementById("accessoryPowerConsumption").value) >= selectedPowerConsumptionWh){
-    //             battery[j]["usage"] = Math.round((battery[j].capacityAh * battery[j].voltage / (selectedPowerConsumptionWh + document.getElementById("accessoryPowerConsumption").value))*10)/10;
-    //             passBatterys.push(battery[j]);
-    //         }
-    //     }
-    //     // console.log(passBatterys);
-    //     View.makeResultTable(passBatterys);
-    // }
-
-    // static limitOfStep3(){
-    //     if (document.getElementById("accessoryPowerConsumption").value >= 100){
-    //         document.getElementById("accessoryPowerConsumption").value = 100;
-    //     } else if (document.getElementById("accessoryPowerConsumption").value <= 0){
-    //         document.getElementById("accessoryPowerConsumption").value = 0;
-    //     }
-    //     Control.screening();
-    // }
 }
 
 function initializeApp(){
@@ -685,17 +535,9 @@ function initializeApp(){
     `
 }
 
-// console.log(target);
 View.makeTitle();
 View.makeStep1View(true);
 View.makeStep2View(true);
 View.makeStep3View(true);
 View.makeStep4View(true);
 View.makeAddPCBtnView();
-
-fetch(config.url + "cpu").then(response=>response.json()).then(datas=>{
-    for(let data in datas){
-        let current = datas[data];
-        // console.log(current);
-    }
-})
